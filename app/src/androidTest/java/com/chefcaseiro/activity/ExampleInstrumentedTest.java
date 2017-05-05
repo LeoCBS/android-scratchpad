@@ -1,4 +1,4 @@
-package com.chefcaseiro.chefcaseiro;
+package com.chefcaseiro.activity;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

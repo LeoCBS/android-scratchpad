@@ -1,4 +1,4 @@
-package com.chefcaseiro.chefcaseiro;
+package com.chefcaseiro.activity;
 
 import org.junit.Test;
 
