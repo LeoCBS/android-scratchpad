@@ -1,9 +1,9 @@
 package com.chefcaseiro.model;
 
-/**
- * Created by leonardo on 5/5/17.
- */
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
+@IgnoreExtraProperties
 public class Dish {
 
     private String uid;

@@ -1,27 +1,25 @@
 package com.chefcaseiro.model;
 
 
-public class Menu {
+import com.google.firebase.database.Exclude;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static android.R.attr.author;
+
+public class Menu extends  BaseModel{
 
     private String uid;
     private String name;
 
     public Menu(){
-
+        super();
     }
-
 
     public Menu(String uid, String name) {
-        this.uid = uid;
+        super(uid);
         this.name = name;
-    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
     }
 
     public String getName() {
@@ -30,5 +28,13 @@ public class Menu {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("uid", uid);
+        result.put("name", this.name);
+        return result;
     }
 }
