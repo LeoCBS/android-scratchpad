@@ -13,10 +13,18 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 
 
+import com.chefcaseiro.data.FirebaseData;
+import com.chefcaseiro.model.BaseModel;
+import com.chefcaseiro.model.Menu;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SignActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -29,6 +37,9 @@ public class SignActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<String> displayArray;
     ArrayList<String> keysArray;
     ListView listView;
+    FirebaseData firebaseData;
+    private DatabaseReference mDatabase;
+    List<BaseModel> menus = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,11 +56,8 @@ public class SignActivity extends AppCompatActivity implements View.OnClickListe
         keysArray = new ArrayList<>();
         valuesAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,android.R.id.text1,displayArray);
         listView.setAdapter(valuesAdapter);
-        //listView.setOnItemClickListener(itemClickListener);
 
-
-        //myFirebaseRef.addChildEventListener(childEventListener);
-
+        this.firebaseData = new FirebaseData();
         save.setOnClickListener(this);
     }
 
@@ -64,8 +72,28 @@ public class SignActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void save(String name,String message){
+    private void loadMenus() {
+        Query query = this.mDatabase.child("menus").orderByChild("name");
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Log.e("Count ", "" + snapshot.getChildrenCount());
+                for (DataSnapshot postSnapshot : snapshot.getChildren()) {
+                    menus.add(postSnapshot.getValue(BaseModel.class));
+                }
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("The read failed: ", databaseError.getMessage());
+            }
+        });
+    }
+
+    private void save(String name,String message){
+        Menu menu = new Menu();
+        menu.setName(name);
+        this.firebaseData.save(menu, "menus");
     }
 
     private void updateListView(){
