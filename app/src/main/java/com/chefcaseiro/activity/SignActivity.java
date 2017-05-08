@@ -11,9 +11,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 
 import com.chefcaseiro.data.FirebaseData;
+import com.chefcaseiro.helper.FirebaseHelper;
 import com.chefcaseiro.model.BaseModel;
 import com.chefcaseiro.model.Menu;
 import com.google.firebase.database.ChildEventListener;
@@ -41,6 +43,8 @@ public class SignActivity extends AppCompatActivity implements View.OnClickListe
     private DatabaseReference mDatabase;
     List<BaseModel> menus = new ArrayList<>();
 
+    FirebaseHelper helper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,11 +58,20 @@ public class SignActivity extends AppCompatActivity implements View.OnClickListe
 
         displayArray  = new ArrayList<>();
         keysArray = new ArrayList<>();
-        valuesAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,android.R.id.text1,displayArray);
-        listView.setAdapter(valuesAdapter);
 
         this.firebaseData = new FirebaseData();
+        helper=new FirebaseHelper(this.mDatabase);
         save.setOnClickListener(this);
+
+        valuesAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,helper.retrieve());
+        listView.setAdapter(valuesAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(SignActivity.this, helper.retrieve().get(position), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -72,23 +85,7 @@ public class SignActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void loadMenus() {
-        Query query = this.mDatabase.child("menus").orderByChild("name");
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                Log.e("Count ", "" + snapshot.getChildrenCount());
-                for (DataSnapshot postSnapshot : snapshot.getChildren()) {
-                    menus.add(postSnapshot.getValue(BaseModel.class));
-                }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("The read failed: ", databaseError.getMessage());
-            }
-        });
-    }
 
     private void save(String name,String message){
         Menu menu = new Menu();
@@ -96,11 +93,7 @@ public class SignActivity extends AppCompatActivity implements View.OnClickListe
         this.firebaseData.save(menu, "menus");
     }
 
-    private void updateListView(){
-        valuesAdapter.notifyDataSetChanged();
-        listView.invalidate();
-        Log.d(TAG, "Length: " + displayArray.size());
-    }
+
 
 
 }
